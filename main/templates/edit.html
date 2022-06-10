@@ -1,0 +1,92 @@
+{% extends "main.html" %}
+
+{% block contents %}
+<script>
+    $(document).ready(function() {
+        $("#summernote").summernote({
+            height: 300,
+            mixHeight: null,
+            maxHeight: null,
+            lang: "ko-KR",
+            popover: {
+                image: [],
+                link: [],
+                air: []
+            },
+            callbacks: {
+                onImageUpload: function(image) {
+                    for(var i = 0; i < image.length; i++) {
+                        uploadImage(image[i]);
+                    }
+                }
+            }
+        });
+    });
+
+    function uploadImage(image) {
+        var data = new FormData();
+        data.append("image", image);
+        
+        $.ajax({
+            url: "{{url_for('board.upload_image')}}",
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: data,
+            type: "post",
+            success: function(url) {
+                var image = $("<img>").attr("src", url).css('max-width', "900px");
+                $("#summernote").summernote("insertNode", image[0]);
+            },
+            error: function(data) {
+                console.log(data);
+                alert(data);
+            }
+        });
+    }
+</script>
+
+<script>
+    function checkForm() {
+        if($.trim($("#title").val()) == "") {
+            alert("제목을 입력하세요.");
+            $("#title").focus();
+            return false;
+        }
+        if($.trim($("#summernote").val()) == "") {
+            alert("내용을 입력하세요.");
+            $("#summernote").focus();
+            return false;
+        }
+    }
+</script>
+
+<form name="form" method="POST" action="{{url_for('board.board_edit', idx=data._id)}}" onsubmit="return checkForm()">
+    <div class="form-group">
+        <label for="name">작성자</label>
+        <input class="form-control" type="text" name="name" value="{{session['name']}}" readonly>
+    </div>
+    <div class="form-group">
+        <label for="title">제목</label>
+        <input class="form-control" type="text" name="title" value="{{data.title}}" id="title">
+    </div>
+    <div class="form-group">
+        <label for="keyword">키워드</label>
+        <input class="form-control" type="text" name="keyword" id="keyword" value="{{data.keyword}}">
+    </div>
+    <div class="form-group">
+        <label for="state">판매상태</label>
+        <select name="state" id="state" class="form-control">
+          <option selected>판매중</option>
+          <option>판매완료</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="contents">내용</label>
+        <textarea rows="8" class="form-control" name="contents" id="summernote">{{data.contents}}</textarea>
+    </div>
+    <br>
+    <div class="text-center"><input class="btn btn-primary" type="submit" value="수정하기"></div>
+</form>
+
+{% endblock %}

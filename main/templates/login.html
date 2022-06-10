@@ -1,0 +1,44 @@
+{% extends "main.html" %}
+
+{% block contents %}
+<script>
+    function checkForm() {
+        if($.trim($("#email").val()) == ""){
+            alert("이메일을 입력하세요.");
+            $("#email").focus();
+            return false;
+        }
+
+        if(!validateEmail($.trim($("#email").val()))) {
+            alert("이메일 형식에 맞게 입력하세요.");
+            $("#email").focus();
+            return false;
+        }
+        
+        if($.trim($("#pass").val()) == ""){
+            alert("비밀번호를 입력하세요.");
+            $("#pass").focus();
+            return false;
+        }
+        return true;
+    }
+</script>
+
+<form name="form" action="{{url_for('member.member_login')}}" method="POST" onsubmit="return checkForm()">
+    {% if next_url %}
+        <input type="hidden" name="next_url" value="{{next_url}}">
+    {% endif %}
+    <div class="form-group">
+        <label for="email">이메일</label>
+        <input class="form-control" type="text" name="email" id="email">
+    </div>
+    <div class="form-group">
+        <label for="pass">비밀번호</label>
+        <input class="form-control" type="password" name="pass" id="pass">
+    </div>
+    <br>
+    <div class="text-center float-start"><input type="submit" class="btn btn-primary" value="로그인"></div>
+    <a href="{{url_for('board.lists')}}" class="btn btn-primary float-end">리스트</a>
+</form>
+
+{% endblock %}

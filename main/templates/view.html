@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+{% block contents %}
+
+
+<table class="table table-bordered">
+    <tbody>
+        <tr>
+            <td colspan='2'>제목 : {{result.title}}</td>
+        </tr>
+        <tr>
+            <td>키워드 : {{result.keyword}}</td>
+            <td class="text-right">판매상태: {{result.state}}</td>
+        </tr>
+        <tr>
+            <td>작성자 : {{result.name}}</td>
+            <td class="text-right">작성일 : {{result.pubdate | formatdatetime}}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><div style="min-height:200px;">{% autoescape false %}{{result.contents}}{% endautoescape %}</div></td>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+
+<a class="btn btn-primary float-start m-1" href="{{url_for('board.lists', page=page, search=search)}}">리스트</a>
+{% if session["id"] == result.writer_id %}
+<a class="btn btn-danger float-end m-1" href="{{url_for('board.board_delete', idx=result.id)}}">글삭제</a>
+<a class="btn btn-warning float-end m-1" href="{{url_for('board.board_edit', idx=result.id)}}">글수정</a>
+{% endif %}
+
+{% endblock %}

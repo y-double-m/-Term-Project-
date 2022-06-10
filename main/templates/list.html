@@ -1,0 +1,81 @@
+{% extends "main.html" %}
+
+{% block contents %}
+<script>
+    function search() {
+        var v_search = document.getElementById("search").value;
+
+        if(v_search == "") {
+            return false;
+        } else {
+            self.location.href = "{{url_for('board.lists')}}?search=" + v_search;
+        }
+    }
+</script>
+
+<h1 class="display-2 text-primary text-center">A Personal Trading Site</h1>
+<br>
+{% if datas|length > 0 %}
+<table class="table">
+    <thead>
+        <tr>
+            <td>번호</td>
+            <td>키워드</td>
+            <td>제목</td>
+            <td>이름</td>
+            <td>날짜</td>
+            <td>판매상태</td>
+        </tr>
+    </thead>
+    <tbody>
+        <!--반복되는 구간-->
+        {% for data in datas %}
+        <tr>
+            <td>{{loop.index + ((page - 1) * limit)}}</td>
+            <td>{{data.keyword}}</td>
+            <td><a href="{{url_for('board.board_view', idx=data._id, page=page, search=search)}}">{{data.title}}</a></td>
+            <td>{{data.name}}</td>
+            <td>{{data.pubdate | formatdatetime}}</td>
+            <td>{{data.state}}</td>
+        </tr>
+        {% endfor %}
+        <!--반복되는 구간 끝-->
+    </tbody>
+</table>
+
+<ul class="pagination justify-content-center">
+{% if block_start - 1 > 0 %}
+    <li class="page-item"><a class="page-link" href="{{url_for('board.lists', page=block_start-1, search=search)}}">[이전]</a></li>
+{% endif %}
+
+{% for i in range(block_start, block_last + 1) %}
+    {% if i > last_page_num %}
+        {{ "" }}
+    {% else %}
+        {% if i == page %}
+        <li class="page-item"><a class="page-link active text-warning">{{ i }}</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{url_for('board.lists', page=i, search=search)}}">{{ i }}</a></li>
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if block_last < last_page_num %}
+<li class="page-item"><a class="page-link" href="{{url_for('board.lists', page=block_last+1, search=search)}}">[다음]</a></li>
+{% endif %}
+</ul>
+
+<a href="{{url_for('board.board_write')}}" class="btn btn-primary m-lg-3 float-end">글작성</a>
+
+<div class="text-center">
+    <input type="text" name="search" id="search" {% if search != "" %} value={{search}} {% endif %} placeholder="키워드를 입력해주세요">
+    <input type="button" value="검색" onclick="search()" class="btn btn-secondary">
+</div>
+
+{% else %}
+<h3>검색 키워드에 해당하는 물품이 없습니다.</h3>
+<br>
+<a href="{{url_for('board.lists')}}" class="btn btn-primary">리스트</a>
+{% endif %}
+
+{% endblock %}
